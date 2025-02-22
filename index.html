@@ -4,21 +4,28 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>تتبع الأحداث اليومية</title>
+  <!-- أيقونات -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.344.0/font/lucide.min.css">
   <style>
     :root {
       --primary: #3b82f6;
       --primary-dark: #2563eb;
-      --secondary: #64748b;
+      --secondary: #9ca3af; /* درجة أفتح للرمادي */
       --danger: #ef4444;
       --success: #22c55e;
-      --background: #f0f9ff;
-      --card: #ffffff;
-      --text: #1e293b;
-      --border: #e2e8f0;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      --tooltip-bg: #1e293b;
+
+      /* الوضع الداكن */
+      --background: #121212;
+      --card: #1f1f1f;
+      --text: #f8fafc;
+      --border: #2e2e2e;
+
+      /* الظلال */
+      --shadow: 0 2px 4px rgba(0,0,0,0.5);
+      --shadow-lg: 0 4px 10px rgba(0,0,0,0.6);
+
+      /* لون خلفية التولتيب */
+      --tooltip-bg: rgba(0,0,0,0.8);
     }
 
     * {
@@ -30,11 +37,12 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: var(--background);
-      background-image: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      background-image: linear-gradient(135deg, #1c1c1c 0%, #2b2b2b 100%);
       color: var(--text);
       line-height: 1.5;
       min-height: 100vh;
       padding: 2rem 1rem;
+      font-size: 14px; /* تقليص الخط بشكل عام */
     }
 
     .container {
@@ -45,22 +53,22 @@
     h1 {
       text-align: center;
       color: var(--primary);
-      font-size: 2.5rem;
+      font-size: 2rem;
       margin-bottom: 2rem;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 0.75rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
     }
 
     h1 i {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
 
     .input-container {
       background: var(--card);
-      padding: 2rem;
+      padding: 1.5rem;
       border-radius: 1rem;
       box-shadow: var(--shadow-lg);
       margin-bottom: 2rem;
@@ -74,9 +82,7 @@
     .input-container::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       height: 4px;
       background: linear-gradient(to right, var(--primary), var(--primary-dark));
     }
@@ -97,24 +103,25 @@
 
     input[type="text"] {
       width: 100%;
-      padding: 0.75rem 2.5rem 0.75rem 1rem;
-      font-size: 1rem;
+      padding: 0.65rem 2.5rem 0.65rem 1rem;
+      font-size: 0.95rem;
       border: 2px solid var(--border);
       border-radius: 0.5rem;
       transition: all 0.3s ease;
-      background: #f8fafc;
+      background: #272727;
+      color: var(--text);
     }
 
     input[type="text"]:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
-      background: white;
+      box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+      background: #2d2d2d;
     }
 
     button {
-      padding: 0.75rem;
-      font-size: 1.25rem;
+      padding: 0.65rem;
+      font-size: 1rem;
       border: none;
       border-radius: 0.5rem;
       cursor: pointer;
@@ -125,6 +132,7 @@
       justify-content: center;
       min-width: 2.5rem;
       min-height: 2.5rem;
+      color: #fff;
     }
 
     button::before {
@@ -133,16 +141,17 @@
       bottom: 100%;
       left: 50%;
       transform: translateX(-50%) translateY(-8px);
-      padding: 0.5rem 0.75rem;
+      padding: 0.4rem 0.6rem;
       background: var(--tooltip-bg);
-      color: white;
-      font-size: 0.875rem;
+      color: #fff;
+      font-size: 0.75rem;
       border-radius: 0.25rem;
       white-space: nowrap;
       opacity: 0;
       visibility: hidden;
       transition: all 0.2s ease;
       pointer-events: none;
+      z-index: 10;
     }
 
     button::after {
@@ -151,7 +160,7 @@
       bottom: 100%;
       left: 50%;
       transform: translateX(-50%) translateY(4px);
-      border: 6px solid transparent;
+      border: 5px solid transparent;
       border-top-color: var(--tooltip-bg);
       opacity: 0;
       visibility: hidden;
@@ -168,9 +177,7 @@
 
     .btn-primary {
       background-color: var(--primary);
-      color: white;
     }
-
     .btn-primary:hover {
       background-color: var(--primary-dark);
       transform: translateY(-1px);
@@ -179,9 +186,7 @@
 
     .btn-secondary {
       background-color: var(--secondary);
-      color: white;
     }
-
     .btn-secondary:hover {
       opacity: 0.9;
       transform: translateY(-1px);
@@ -190,9 +195,7 @@
 
     .btn-danger {
       background-color: var(--danger);
-      color: white;
     }
-
     .btn-danger:hover {
       opacity: 0.9;
       transform: translateY(-1px);
@@ -213,24 +216,25 @@
     }
 
     th, td {
-      padding: 1rem;
+      padding: 0.75rem;
       text-align: right;
       border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
     }
 
     th {
-      background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+      background: linear-gradient(to right, #1c1c1c, #2b2b2b);
       color: var(--primary);
       font-weight: 600;
       white-space: nowrap;
     }
 
     th i {
-      margin-left: 0.5rem;
+      margin-left: 0.3rem;
     }
 
     tr:hover {
-      background-color: rgba(59,130,246,0.05);
+      background-color: rgba(59,130,246,0.1);
     }
 
     tr:last-child td {
@@ -250,47 +254,16 @@
     }
 
     .event-actions button {
-      padding: 0.5rem;
+      padding: 0.4rem;
+      font-size: 0.85rem;
     }
 
     td i {
-      margin-left: 0.5rem;
+      margin-left: 0.3rem;
       color: var(--secondary);
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .input-container {
-        flex-direction: column;
-      }
-
-      input[type="text"] {
-        width: 100%;
-      }
-
-      th, td {
-        padding: 0.75rem;
-      }
-
-      .event-actions {
-        flex-direction: row;
-      }
-
-      h1 {
-        font-size: 2rem;
-      }
-
-      h1 i {
-        font-size: 1.75rem;
-      }
-
-      button::before {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-      }
-    }
-
-    /* Animations */
+    /* تأثيرات الظهور */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -309,7 +282,7 @@
       animation: slideIn 0.3s ease-out forwards;
     }
 
-    /* Empty State */
+    /* حالة الجدول الفارغ */
     .empty-state {
       text-align: center;
       padding: 3rem 2rem;
@@ -326,11 +299,90 @@
       opacity: 0.5;
     }
 
+    /* شاشات أصغر من 768px */
+    @media (max-width: 768px) {
+      body {
+        font-size: 13px; /* تقليل الخط أكثر */
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      h1 i {
+        font-size: 1.4rem;
+      }
+      .input-container {
+        /* نزيل flex-direction: column; لتبقى في نفس السطر */
+        padding: 1rem;
+      }
+      .input-wrapper i {
+        right: 0.8rem;
+      }
+      input[type="text"] {
+        font-size: 0.85rem;
+        padding: 0.5rem 2rem 0.5rem 0.8rem;
+      }
+      button {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+      }
+      th, td {
+        padding: 0.5rem;
+        font-size: 0.8rem;
+      }
+      .event-actions button {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+      }
+      .empty-state {
+        padding: 2rem 1rem;
+      }
+      .empty-state i {
+        font-size: 2.5rem;
+      }
+    }
+
+    /* شاشات أصغر من 480px */
+    @media (max-width: 480px) {
+      body {
+        font-size: 12px; /* تصغير أكثر للجوال */
+      }
+      h1 {
+        font-size: 1.4rem;
+      }
+      h1 i {
+        font-size: 1.2rem;
+      }
+      .input-container {
+        padding: 0.8rem;
+      }
+      input[type="text"] {
+        font-size: 0.75rem;
+        padding: 0.45rem 1.8rem 0.45rem 0.8rem;
+      }
+      button {
+        font-size: 0.75rem;
+        padding: 0.4rem;
+      }
+      th, td {
+        padding: 0.4rem;
+        font-size: 0.75rem;
+      }
+      .event-actions button {
+        padding: 0.3rem;
+        font-size: 0.7rem;
+      }
+      .empty-state {
+        padding: 1.5rem 1rem;
+      }
+      .empty-state i {
+        font-size: 2rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>
+    <h1 class="fade-in">
       <i class="lucide-calendar-clock"></i>
       تتبع الأحداث اليومية
     </h1>
@@ -408,12 +460,10 @@
       const day = date.getDate().toString().padStart(2, '0');
       const month = (date.getMonth() + 1).toString().padStart(2, '0');
       const year = date.getFullYear();
-      const formattedDate = `${day}/${month}/${year}`;
       const hours = date.getHours().toString().padStart(2, '0');
       const minutes = date.getMinutes().toString().padStart(2, '0');
       const seconds = date.getSeconds().toString().padStart(2, '0');
-      const formattedTime = `${hours}:${minutes}:${seconds}`;
-      return `${dayName}، ${formattedDate}، ${formattedTime}`;
+      return `${dayName}، ${day}/${month}/${year}، ${hours}:${minutes}:${seconds}`;
     }
     
     function renderTable() {
@@ -500,17 +550,13 @@
         alert("لا توجد أحداث للنسخ!");
         return;
       }
-
       let textToCopy = "";
       events.forEach(function(ev) {
         textToCopy += ev.event + "  " + ev.time + "\n";
       });
-      
-      navigator.clipboard.writeText(textToCopy).then(function() {
-        alert("تم نسخ أحداث اليوم إلى الحافظة.");
-      }).catch(function() {
-        alert("حدث خطأ أثناء النسخ.");
-      });
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => alert("تم نسخ أحداث اليوم إلى الحافظة."))
+        .catch(() => alert("حدث خطأ أثناء النسخ."));
     });
     
     document.getElementById("clearButton").addEventListener("click", function() {
@@ -518,7 +564,6 @@
         alert("لا توجد أحداث للحذف!");
         return;
       }
-
       if (confirm("هل أنت متأكد من حذف جميع الأحداث؟")) {
         events = [];
         updateLocalStorage();
@@ -535,6 +580,7 @@
       }
     });
 
+    // التحميل الأولي
     loadEvents();
     renderTable();
   </script>
