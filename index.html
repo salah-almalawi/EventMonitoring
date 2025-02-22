@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تتبع الأحداث اليومية</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.344.0/font/lucide.min.css">
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --secondary: #64748b;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --background: #f0f9ff;
+      --card: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --tooltip-bg: #1e293b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--background);
+      background-image: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary);
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    h1 i {
+      font-size: 2rem;
+    }
+
+    .input-container {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .input-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+    }
+
+    .input-wrapper {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+
+    .input-wrapper i {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--secondary);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      background: #f8fafc;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+      background: white;
+    }
+
+    button {
+      padding: 0.75rem;
+      font-size: 1.25rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.5rem;
+      min-height: 2.5rem;
+    }
+
+    button::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      padding: 0.5rem 0.75rem;
+      background: var(--tooltip-bg);
+      color: white;
+      font-size: 0.875rem;
+      border-radius: 0.25rem;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    button::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 6px solid transparent;
+      border-top-color: var(--tooltip-bg);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+
+    button:hover::before,
+    button:hover::after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+    }
+
+    .table-container {
+      background: var(--card);
+      border-radius: 1rem;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: right;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: linear-gradient(to right, #f0f9ff, #e0f2fe);
+      color: var(--primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    th i {
+      margin-left: 0.5rem;
+    }
+
+    tr:hover {
+      background-color: rgba(59,130,246,0.05);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .event-actions button {
+      padding: 0.5rem;
+    }
+
+    td i {
+      margin-left: 0.5rem;
+      color: var(--secondary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .input-container {
+        flex-direction: column;
+      }
+
+      input[type="text"] {
+        width: 100%;
+      }
+
+      th, td {
+        padding: 0.75rem;
+      }
+
+      .event-actions {
+        flex-direction: row;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h1 i {
+        font-size: 1.75rem;
+      }
+
+      button::before {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    tr {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+      color: var(--secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--primary);
+      opacity: 0.5;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>
+      <i class="lucide-calendar-clock"></i>
+      تتبع الأحداث اليومية
+    </h1>
+    
+    <div class="input-container fade-in">
+      <div class="input-wrapper">
+        <i class="lucide-pencil"></i>
+        <input type="text" id="eventInput" placeholder="ما هو الحدث الذي تقوم به؟">
+      </div>
+      <button id="addEventButton" class="btn-primary" data-tooltip="إضافة حدث جديد">
+        +
+        <i class="lucide-plus"></i>
+      </button>
+    </div>
+
+    <div class="table-container fade-in">
+      <table id="eventsTable">
+        <thead>
+          <tr>
+            <th>
+              <i class="lucide-file-text"></i>
+              الحدث
+            </th>
+            <th>
+              <i class="lucide-clock"></i>
+              التاريخ والوقت
+            </th>
+            <th>
+              <i class="lucide-settings"></i>
+              الإجراءات
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ستظهر الأحداث هنا -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="controls fade-in">
+      <button id="copyButton" class="btn-secondary" data-tooltip="نسخ أحداث اليوم">
+        Copy
+        <i class="lucide-copy"></i>
+      </button>
+      <button id="clearButton" class="btn-danger" data-tooltip="حذف جميع الأحداث">
+        Delete All
+        <i class="lucide-trash-2"></i>
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    let events = [];
+
+    function updateLocalStorage() {
+      localStorage.setItem("events", JSON.stringify(events));
+    }
+
+    function loadEvents() {
+      const storedEvents = localStorage.getItem("events");
+      if (storedEvents) {
+        events = JSON.parse(storedEvents);
+      }
+    }
+
+    function getSaudiTime() {
+      const now = new Date();
+      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+      return new Date(utc + 3 * 60 * 60 * 1000);
+    }
+    
+    function formatDateTime(date) {
+      const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+      const dayName = days[date.getDay()];
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const formattedDate = `${day}/${month}/${year}`;
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const seconds = date.getSeconds().toString().padStart(2, '0');
+      const formattedTime = `${hours}:${minutes}:${seconds}`;
+      return `${dayName}، ${formattedDate}، ${formattedTime}`;
+    }
+    
+    function renderTable() {
+      const tableBody = document.getElementById("eventsTable").querySelector("tbody");
+      tableBody.innerHTML = "";
+      
+      if (events.length === 0) {
+        const emptyRow = document.createElement("tr");
+        emptyRow.innerHTML = `
+          <td colspan="3" class="empty-state">
+            <i class="lucide-calendar-plus"></i>
+            <div>لا توجد أحداث مسجلة بعد. أضف حدثاً جديداً للبدء!</div>
+          </td>
+        `;
+        tableBody.appendChild(emptyRow);
+        return;
+      }
+
+      events.forEach((eventObject, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>
+            <i class="lucide-file-text"></i>
+            ${eventObject.event}
+          </td>
+          <td>
+            <i class="lucide-clock"></i>
+            ${eventObject.time}
+          </td>
+          <td>
+            <div class="event-actions">
+              <button class="btn-secondary" onclick="editEvent(${index})" data-tooltip="تعديل الحدث">
+                Edit
+                <i class="lucide-edit-2"></i>
+              </button>
+              <button class="btn-danger" onclick="deleteEvent(${index})" data-tooltip="حذف الحدث">
+                Del
+                <i class="lucide-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+    
+    function addEvent() {
+      const eventInput = document.getElementById("eventInput");
+      const eventText = eventInput.value.trim();
+      if (eventText !== "") {
+        const currentTime = getSaudiTime();
+        const formattedTime = formatDateTime(currentTime);
+        const eventObject = { event: eventText, time: formattedTime };
+        events.push(eventObject);
+        updateLocalStorage();
+        renderTable();
+        eventInput.value = "";
+        eventInput.focus();
+      }
+    }
+    
+    function editEvent(index) {
+      let newEventText = prompt("قم بتعديل الحدث:", events[index].event);
+      if (newEventText !== null) {
+        newEventText = newEventText.trim();
+        if (newEventText !== "") {
+          events[index].event = newEventText;
+          updateLocalStorage();
+          renderTable();
+        }
+      }
+    }
+    
+    function deleteEvent(index) {
+      if (confirm("هل أنت متأكد من حذف هذا الحدث؟")) {
+        events.splice(index, 1);
+        updateLocalStorage();
+        renderTable();
+      }
+    }
+    
+    document.getElementById("copyButton").addEventListener("click", function() {
+      if (events.length === 0) {
+        alert("لا توجد أحداث للنسخ!");
+        return;
+      }
+
+      let textToCopy = "";
+      events.forEach(function(ev) {
+        textToCopy += ev.event + "  " + ev.time + "\n";
+      });
+      
+      navigator.clipboard.writeText(textToCopy).then(function() {
+        alert("تم نسخ أحداث اليوم إلى الحافظة.");
+      }).catch(function() {
+        alert("حدث خطأ أثناء النسخ.");
+      });
+    });
+    
+    document.getElementById("clearButton").addEventListener("click", function() {
+      if (events.length === 0) {
+        alert("لا توجد أحداث للحذف!");
+        return;
+      }
+
+      if (confirm("هل أنت متأكد من حذف جميع الأحداث؟")) {
+        events = [];
+        updateLocalStorage();
+        renderTable();
+      }
+    });
+    
+    document.getElementById("addEventButton").addEventListener("click", addEvent);
+    
+    document.getElementById("eventInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addEvent();
+      }
+    });
+
+    loadEvents();
+    renderTable();
+  </script>
+</body>
+</html>
