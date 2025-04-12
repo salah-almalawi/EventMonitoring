@@ -1,562 +1,460 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تتبع الأحداث اليومية</title>
-  <!-- أيقونات -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.344.0/font/lucide.min.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=edit_square" />
-  <style>
-    :root {
-      --primary: #3b82f6;
-      --primary-dark: #2563eb;
-      --secondary: #9ca3af;
-      /* درجة أفتح للرمادي */
-      --danger: #ef4444;
-      --success: #22c55e;
-      /* الوضع الداكن */
-      --background: #121212;
-      --card: #1f1f1f;
-      --text: #f8fafc;
-      --border: #2e2e2e;
-      /* الظلال */
-      --shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-      --shadow-lg: 0 4px 10px rgba(0, 0, 0, 0.6);
-      /* لون خلفية التولتيب */
-      --tooltip-bg: rgba(0, 0, 0, 0.8);
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: var(--background);
-      background-image: linear-gradient(135deg, #1c1c1c 0%, #2b2b2b 100%);
-      color: var(--text);
-      line-height: 1.5;
-      min-height: 100vh;
-      padding: 2rem 1rem;
-      font-size: 14px;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    h1 {
-      text-align: center;
-      color: var(--primary);
-      font-size: 2rem;
-      margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.75rem;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    }
-    h1 i {
-      font-size: 1.8rem;
-    }
-    .input-container {
-      background: var(--card);
-      padding: 1.5rem;
-      border-radius: 1rem;
-      box-shadow: var(--shadow-lg);
-      margin-bottom: 2rem;
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      position: relative;
-      overflow: hidden;
-    }
-    .input-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(to right, var(--primary), var(--primary-dark));
-    }
-    .input-wrapper {
-      flex: 1;
-      min-width: 200px;
-      position: relative;
-    }
-    .input-wrapper i {
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--secondary);
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 0.65rem 2.5rem 0.65rem 1rem;
-      font-size: 0.95rem;
-      border: 2px solid var(--border);
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
-      background: #272727;
-      color: var(--text);
-    }
-    th:nth-child(3),
-    td:nth-child(3) {
-      width: 110px;
-      max-width: 110px;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-      background: #2d2d2d;
-    }
-    button {
-      padding: 0.65rem;
-      font-size: 1rem;
-      border: none;
-      border-radius: 0.5rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 2.5rem;
-      min-height: 2.5rem;
-      color: #fff;
-    }
-    button::before {
-      content: attr(data-tooltip);
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      padding: 0.4rem 0.6rem;
-      background: var(--tooltip-bg);
-      color: #fff;
-      font-size: 0.75rem;
-      border-radius: 0.25rem;
-      white-space: nowrap;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-      pointer-events: none;
-      z-index: 10;
-    }
-    button::after {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%) translateY(4px);
-      border: 5px solid transparent;
-      border-top-color: var(--tooltip-bg);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-      pointer-events: none;
-    }
-    button:hover::before,
-    button:hover::after {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-    .btn-primary {
-      background-color: var(--primary);
-    }
-    .btn-primary:hover {
-      background-color: var(--primary-dark);
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-    .btn-secondary {
-      background-color: var(--secondary);
-    }
-    .btn-secondary:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-    .btn-danger {
-      background-color: var(--danger);
-    }
-    .btn-danger:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-      box-shadow: var(--shadow);
-    }
-    .table-container {
-      background: var(--card);
-      border-radius: 1rem;
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    th,
-    td {
-      padding: 0.75rem;
-      text-align: right;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
-    }
-    th {
-      background: linear-gradient(to right, #1c1c1c, #2b2b2b);
-      color: var(--primary);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    th i {
-      margin-left: 0.3rem;
-    }
-    tr:hover {
-      background-color: rgba(59, 130, 246, 0.1);
-    }
-    tr:last-child td {
-      border-bottom: none;
-    }
-    .controls {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .event-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .event-actions button {
-      padding: 0.4rem;
-      font-size: 0.85rem;
-    }
-    td i {
-      margin-left: 0.3rem;
-      color: var(--secondary);
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    @keyframes slideIn {
-      from {
-        transform: translateX(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateX(0);
-        opacity: 1;
-      }
-    }
-    .fade-in {
-      animation: fadeIn 0.3s ease-out forwards;
-    }
-    tr {
-      animation: slideIn 0.3s ease-out forwards;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 3rem 2rem;
-      color: var(--secondary);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-    .empty-state i {
-      font-size: 3rem;
-      color: var(--primary);
-      opacity: 0.5;
-    }
-    @media (max-width: 768px) {
-      body {
-        font-size: 13px;
-      }
-      h1 {
-        font-size: 1.6rem;
-      }
-      h1 i {
-        font-size: 1.4rem;
-      }
-      .input-container {
-        padding: 1rem;
-      }
-      .input-wrapper i {
-        right: 0.8rem;
-      }
-      input[type="text"] {
-        font-size: 0.85rem;
-        padding: 0.5rem 2rem 0.5rem 0.8rem;
-      }
-      button {
-        font-size: 0.85rem;
-        padding: 0.5rem;
-      }
-      th,
-      td {
-        padding: 0.5rem;
-        font-size: 0.8rem;
-      }
-      .event-actions button {
-        padding: 0.4rem;
-        font-size: 0.75rem;
-      }
-      .empty-state {
-        padding: 2rem 1rem;
-      }
-      .empty-state i {
-        font-size: 2.5rem;
-      }
-    }
-    @media (max-width: 480px) {
-      body {
-        font-size: 12px;
-      }
-      h1 {
-        font-size: 1.4rem;
-      }
-      h1 i {
-        font-size: 1.2rem;
-      }
-      .input-container {
-        padding: 0.8rem;
-      }
-      input[type="text"] {
-        font-size: 0.75rem;
-        padding: 0.45rem 1.8rem 0.45rem 0.8rem;
-      }
-      button {
-        font-size: 0.75rem;
-        padding: 0.4rem;
-      }
-      th,
-      td {
-        padding: 0.4rem;
-        font-size: 0.75rem;
-      }
-      .event-actions button {
-        padding: 0.3rem;
-        font-size: 0.7rem;
-      }
-      .empty-state {
-        padding: 1.5rem 1rem;
-      }
-      .empty-state i {
-        font-size: 2rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدرب قواعد اللغة الإنجليزية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --background-color: #f3f4f6;
+            --card-background: #ffffff;
+            --text-color: #1f2937;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            background: var(--card-background);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        /* .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        } */
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        /* button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        } */
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        ul {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        li {
+            background-color: #f8fafc;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: var(--border-radius);
+            border-right: 4px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        li .text {
+            flex: 1;
+        }
+        
+        li button {
+            margin-left: 8px;
+            padding: 6px 12px;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: var(--border-radius);
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        /* li button:hover {
+            background-color: var(--primary-color);
+        } */
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: var(--border-radius);
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #10b981;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            animation: fadeInOut 2s ease;
+            z-index: 1000;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translate(-50%, -20px); }
+            20% { opacity: 1; transform: translate(-50%, 0); }
+            80% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -20px); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .section {
+                padding: 1.5rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="fade-in">
-      <i class="lucide-calendar-clock"></i>
-      تتبع الأحداث اليومية
-    </h1>
-    <div class="input-container fade-in">
-      <div class="input-wrapper">
-        <i class="lucide-pencil"></i>
-        <input type="text" id="eventInput" placeholder="ما هو الحدث الذي تقوم به؟">
-      </div>
-      <button id="addEventButton" class="btn-primary" data-tooltip="إضافة حدث جديد">
-        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="white">
-          <rect x="5" y="11" width="14" height="2" rx="1" />
-          <rect x="11" y="5" width="2" height="14" rx="1" />
-        </svg>
-      </button>
-    </div>
-    <div class="table-container fade-in">
-      <table id="eventsTable">
-        <thead>
-          <tr>
-            <th>
-              <i class="lucide-file-text"></i>
-              الحدث
-            </th>
-            <th>
-              <i class="lucide-clock"></i>
-              الساعة
-            </th>
-            <th>
-              <i class="lucide-settings"></i>
-              الإجراءات
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- ستظهر الأحداث هنا -->
-        </tbody>
-      </table>
-    </div>
-    <div class="controls fade-in">
-      <button id="copyButton" class="btn-secondary" data-tooltip="نسخ أحداث اليوم">
-        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm4 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h12v14z" />
-        </svg>
-      </button>
-      <button id="clearButton" class="btn-danger" data-tooltip="حذف جميع الأحداث">
-        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-          <path d="M3 6h18v2H3V6zm2 3h14v11c0 1.1-.9 2-2 2H7c-1.1 0-2-.9-2-2V9zm3 2v8h2v-8H8zm4 0v8h2v-8h-2zm4 0v8h2v-8h-2zm-5-10h6v2h-6V1z" />
-        </svg>
-      </button>
-    </div>
-  </div>
-  <script>
-    let events = [];
-    function updateLocalStorage() {
-      localStorage.setItem("events", JSON.stringify(events));
-    }
-    function loadEvents() {
-      const storedEvents = localStorage.getItem("events");
-      if (storedEvents) {
-        events = JSON.parse(storedEvents);
-      }
-    }
-    function getSaudiTime() {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      return new Date(utc + 3 * 60 * 60 * 1000);
-    }
-    function formatDateTime(date) {
-      const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
-      const dayName = days[date.getDay()];
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      const seconds = date.getSeconds().toString().padStart(2, '0');
-      return `${dayName}، ${day}/${month}/${year}، ${hours}:${minutes}:${seconds}`;
-    }
-    function extractHour(fullTime) {
-      const parts = fullTime.split("، ");
-      return parts[2] || fullTime;
-    }
-    function renderTable() {
-      const tableBody = document.getElementById("eventsTable").querySelector("tbody");
-      tableBody.innerHTML = "";
-      if (events.length === 0) {
-        const emptyRow = document.createElement("tr");
-        emptyRow.innerHTML = `
-          <td colspan="3" class="empty-state">
-            <i class="lucide-calendar-plus"></i>
-            <div>لا توجد أحداث مسجلة بعد. أضف حدثاً جديداً للبدء!</div>
-          </td>
-        `;
-        tableBody.appendChild(emptyRow);
-        return;
-      }
-      events.forEach((eventObject, index) => {
-        const hourOnly = extractHour(eventObject.time);
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>
-            <i class="lucide-file-text"></i>
-            ${eventObject.event}
-          </td>
-          <td>
-            <i class="lucide-alarm-check"></i>
-            ${hourOnly}
-          </td>
-          <td>
-            <div class="event-actions">
-              <button class="btn-secondary" onclick="editEvent(${index})" data-tooltip="تعديل الحدث">
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path d="M14.06 3c-.52 0-1.04.2-1.44.6L3.6 12.63c-.28.28-.48.64-.56 1.03L2 20c-.06.3.02.62.22.86.2.24.48.38.78.41l6.35-1c.39-.06.75-.26 1.03-.54l9.02-9.02c.8-.8.8-2.1 0-2.9l-3.7-3.7c-.4-.4-.92-.6-1.44-.6zm0 2l3.7 3.7-9.02 9.02-3.7-3.7L14.06 5zm-10.2 9.82l2.6 2.6-3.07.48.47-3.08z"/>
-                </svg>
-              </button>
-              <button class="btn-danger" onclick="deleteEvent(${index})" data-tooltip="حذف الحدث">
-                <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                  <path d="M6 7v12c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7h2V5h-6V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v1H4v2h2zm2 0h8v12H8V7zm2-3h4v1h-4V4zm1 4v8h2V8h-2z"/>
-                </svg>
-              </button>
+    <div class="container">
+        <h1>مدرب قواعد اللغة الإنجليزية</h1>
+        
+        <div class="section">
+            <h2>القواعد التي أعرفها</h2>
+            <div class="input-group">
+                <input type="text" id="knownRuleInput" placeholder="أدخل قاعدة تعلمتها">
+                <button onclick="addKnownRule()">تم</button>
             </div>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-    function addEvent() {
-      const eventInput = document.getElementById("eventInput");
-      const eventText = eventInput.value.trim();
-      if (eventText !== "") {
-        const currentTime = getSaudiTime();
-        const formattedTime = formatDateTime(currentTime);
-        const eventObject = { event: eventText, time: formattedTime };
-        events.push(eventObject);
-        updateLocalStorage();
-        renderTable();
-        eventInput.value = "";
-        eventInput.focus();
-      }
-    }
-    function editEvent(index) {
-      let newEventText = prompt("قم بتعديل الحدث:", events[index].event);
-      if (newEventText !== null) {
-        newEventText = newEventText.trim();
-        if (newEventText !== "") {
-          events[index].event = newEventText;
-          updateLocalStorage();
-          renderTable();
+            <ul id="knownRulesList"></ul>
+        </div>
+        
+        <div class="section">
+            <h2>القواعد التي أريد التدرب عليها</h2>
+            <div class="input-group">
+                <input type="text" id="practiceRuleInput" placeholder="أدخل قاعدة للتدرب عليها">
+                <button onclick="addPracticeRule()">حفظ</button>
+            </div>
+            <ul id="practiceRulesList"></ul>
+        </div>
+        
+        <div class="section">
+            <h2>التلقينة</h2>
+            <textarea id="promptOutput" readonly></textarea>
+            <button onclick="copyPrompt()">انسخ التلقينة</button>
+        </div>
+    </div>
+
+    <script>
+        // استرجاع القوائم من localStorage
+        function loadLists() {
+            let knownRules = JSON.parse(localStorage.getItem('knownRules')) || [];
+            let practiceRules = JSON.parse(localStorage.getItem('practiceRules')) || [];
+            return { knownRules, practiceRules };
         }
-      }
-    }
-    function deleteEvent(index) {
-      if (confirm("هل أنت متأكد من حذف هذا الحدث؟")) {
-        events.splice(index, 1);
-        updateLocalStorage();
-        renderTable();
-      }
-    }
-    document.getElementById("copyButton").addEventListener("click", function () {
-      if (events.length === 0) {
-        alert("لا توجد أحداث للنسخ!");
-        return;
-      }
-      let textToCopy = "";
-      events.forEach(function (ev) {
-        textToCopy += ev.event + "  " + ev.time + "\n";
-      });
-      navigator.clipboard.writeText(textToCopy)
-        .then(() => alert("تم نسخ أحداث اليوم إلى الحافظة."))
-        .catch(() => alert("حدث خطأ أثناء النسخ."));
-    });
-    document.getElementById("clearButton").addEventListener("click", function () {
-      if (events.length === 0) {
-        alert("لا توجد أحداث للحذف!");
-        return;
-      }
-      if (confirm("هل أنت متأكد من حذف جميع الأحداث؟")) {
-        events = [];
-        updateLocalStorage();
-        renderTable();
-      }
-    });
-    document.getElementById("addEventButton").addEventListener("click", addEvent);
-    document.getElementById("eventInput").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        addEvent();
-      }
-    });
-    loadEvents();
-    renderTable();
-  </script>
+
+        function showCopySuccess() {
+            const notification = document.createElement('div');
+            notification.className = 'copy-success';
+            notification.textContent = 'تم نسخ التلقينة بنجاح!';
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // تحديث عرض القوائم وتوليد التلقينة
+        function updateListDisplays() {
+            const { knownRules, practiceRules } = loadLists();
+            const knownRulesList = document.getElementById('knownRulesList');
+            const practiceRulesList = document.getElementById('practiceRulesList');
+            
+            // تفريغ القوائم الحالية وإعادة توليدها
+            knownRulesList.innerHTML = '';
+            knownRules.forEach((rule, index) => {
+                const li = document.createElement('li');
+                const span = document.createElement('span');
+                span.className = 'text';
+                span.textContent = rule;
+                li.appendChild(span);
+
+                // زر تعديل للقواعد التي أعرفها
+                const editBtn = document.createElement('button');
+                editBtn.textContent = "تعديل";
+                editBtn.onclick = () => editKnownRule(index);
+                li.appendChild(editBtn);
+
+                // زر حذف للقواعد التي أعرفها
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = "حذف";
+                deleteBtn.onclick = () => deleteKnownRule(index);
+                li.appendChild(deleteBtn);
+
+                knownRulesList.appendChild(li);
+            });
+            
+            practiceRulesList.innerHTML = '';
+            practiceRules.forEach((rule, index) => {
+                const li = document.createElement('li');
+                const span = document.createElement('span');
+                span.className = 'text';
+                span.textContent = rule;
+                li.appendChild(span);
+
+                // زر تعديل للقواعد التي أريد التدرب عليها
+                const editBtn = document.createElement('button');
+                editBtn.textContent = "تعديل";
+                editBtn.onclick = () => editPracticeRule(index);
+                li.appendChild(editBtn);
+
+                // زر حذف للقواعد التي أريد التدرب عليها
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = "حذف";
+                deleteBtn.onclick = () => deletePracticeRule(index);
+                li.appendChild(deleteBtn);
+
+                // زر ترقية لتحويل القاعدة من قائمة التدرب إلى القواعد المعروفة
+                const promoteBtn = document.createElement('button');
+                promoteBtn.textContent = "ترقية";
+                promoteBtn.onclick = () => promotePracticeRule(index);
+                li.appendChild(promoteBtn);
+
+                practiceRulesList.appendChild(li);
+            });
+            
+            updatePrompt();
+        }
+        
+        // وظيفة إضافة قاعدة إلى قائمة القواعد التي أعرفها
+        function addKnownRule() {
+            const knownRuleInput = document.getElementById('knownRuleInput');
+            const rule = knownRuleInput.value.trim();
+            if (rule === '') return;
+            
+            let { knownRules } = loadLists();
+            knownRules.push(rule);
+            localStorage.setItem('knownRules', JSON.stringify(knownRules));
+            
+            knownRuleInput.value = '';
+            updateListDisplays();
+        }
+        
+        // وظيفة إضافة قاعدة إلى قائمة القواعد التي أريد التدرب عليها
+        function addPracticeRule() {
+            const practiceRuleInput = document.getElementById('practiceRuleInput');
+            const rule = practiceRuleInput.value.trim();
+            if (rule === '') return;
+            
+            let { practiceRules } = loadLists();
+            practiceRules.push(rule);
+            localStorage.setItem('practiceRules', JSON.stringify(practiceRules));
+            
+            practiceRuleInput.value = '';
+            updateListDisplays();
+        }
+        
+        // دوال التعديل والحذف للقاعدة المعروفة
+        function editKnownRule(index) {
+            const { knownRules } = loadLists();
+            const newRule = prompt("تعديل القاعدة:", knownRules[index]);
+            if (newRule !== null && newRule.trim() !== "") {
+                knownRules[index] = newRule.trim();
+                localStorage.setItem('knownRules', JSON.stringify(knownRules));
+                updateListDisplays();
+            }
+        }
+        
+        function deleteKnownRule(index) {
+            const { knownRules } = loadLists();
+            if (confirm("هل أنت متأكد من حذف هذه القاعدة؟")) {
+                knownRules.splice(index, 1);
+                localStorage.setItem('knownRules', JSON.stringify(knownRules));
+                updateListDisplays();
+            }
+        }
+        
+        // دوال التعديل والحذف لقواعد التدرب عليها
+        function editPracticeRule(index) {
+            const { practiceRules } = loadLists();
+            const newRule = prompt("تعديل القاعدة:", practiceRules[index]);
+            if (newRule !== null && newRule.trim() !== "") {
+                practiceRules[index] = newRule.trim();
+                localStorage.setItem('practiceRules', JSON.stringify(practiceRules));
+                updateListDisplays();
+            }
+        }
+        
+        function deletePracticeRule(index) {
+            const { practiceRules } = loadLists();
+            if (confirm("هل أنت متأكد من حذف هذه القاعدة؟")) {
+                practiceRules.splice(index, 1);
+                localStorage.setItem('practiceRules', JSON.stringify(practiceRules));
+                updateListDisplays();
+            }
+        }
+        
+        // دالة ترقية قاعدة من قائمة التدرب عليها إلى قائمة القواعد المعروفة
+        function promotePracticeRule(index) {
+            const { practiceRules, knownRules } = loadLists();
+            if (confirm("هل تريد ترقية هذه القاعدة إلى قائمة القواعد التي أعرفها؟")) {
+                // إضافة القاعدة إلى القواعد المعروفة
+                knownRules.push(practiceRules[index]);
+                // حذفها من قائمة التدرب عليها
+                practiceRules.splice(index, 1);
+                localStorage.setItem('knownRules', JSON.stringify(knownRules));
+                localStorage.setItem('practiceRules', JSON.stringify(practiceRules));
+                updateListDisplays();
+            }
+        }
+        
+        // نموذج التلقينة مع المتغيرات
+        function getPromptTemplate() {
+            return `أنت معلم لغة إنجليزية محترف ومتخصص في قواعد اللغة. أعمل على صقل مهاراتي في استخدام قواعد اللغة وأتقن بالفعل القواعد التالية: [KNOWN_RULES]. الآن أرغب بالتدرب على قاعدة جديدة وهي: [PRACTICE_RULES].
+
+مهمتك هي:
+1. إعداد تمرين يتكون من نصوص أو جمل باللغة العربية لأترجمها إلى الإنجليزية، بحيث يشمل النص الذي يتم توليده تطبيق قاعدة [PRACTICE_RULES] مع دمج استخدام القواعد في [KNOWN_RULES] ضمن السياق.
+2. بعد إرسال الترجمة، قم بتصحيح الأخطاء إن وُجدت مع شرح مختصر لكل خطأ، موضحاً كيفية دمج القواعد الجديدة مع القواعد السابقة.
+3. إذا كانت الترجمة صحيحة، انتقل إلى نص آخر يتضمن نفس المتطلبات بحيث أتمرن على مزيد من الاستخدام العملي والتمازج بين القواعد.
+
+اعلم أن الهدف هو تعزيز قاعدة [PRACTICE_RULES] مع التأكيد على إتقان القواعد في [KNOWN_RULES] حتى لا أنساها، مهما طال النص.`;
+        }
+        
+        // تحديث التلقينة مع استبدال المتغيرات بالقيم المحفوظة
+        function updatePrompt() {
+            const { knownRules, practiceRules } = loadLists();
+            let prompt = getPromptTemplate();
+            const knownText = knownRules.length > 0 ? knownRules.join('، ') : 'لم يتم إدخال أي قاعدة';
+            const practiceText = practiceRules.length > 0 ? practiceRules.join('، ') : 'لم يتم إدخال أي قاعدة';
+            prompt = prompt.replace(/\[KNOWN_RULES\]/g, knownText);
+            prompt = prompt.replace(/\[PRACTICE_RULES\]/g, practiceText);
+            document.getElementById('promptOutput').value = prompt;
+        }
+        
+        // وظيفة النسخ إلى الحافظة
+        function copyPrompt() {
+            const promptText = document.getElementById('promptOutput').value;
+            navigator.clipboard.writeText(promptText).then(() => {
+                showCopySuccess();
+            }).catch(err => {
+                alert('حدث خطأ أثناء النسخ: ' + err);
+            });
+        }
+
+        // إضافة اختصارات لوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (document.activeElement.id === 'knownRuleInput') {
+                    addKnownRule();
+                } else if (document.activeElement.id === 'practiceRuleInput') {
+                    addPracticeRule();
+                }
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', updateListDisplays);
+    </script>
 </body>
 </html>
